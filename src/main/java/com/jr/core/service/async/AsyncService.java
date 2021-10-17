@@ -1,6 +1,6 @@
 package com.jr.core.service.async;
 
-import com.jr.core.utils.log.LogUtil;
+import com.jr.core.common.logs.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.*;
 
-import static com.jr.core.utils.log.NameSpaceServiceLog.ASYNC;
-import static com.jr.core.utils.log.NameSpaceServiceLog.EXECUTOR;
+import static com.jr.core.common.async.CoreAsyncNameSpace.ASYNC;
+import static com.jr.core.common.async.CoreAsyncNameSpace.EXECUTOR;
 
 public abstract class AsyncService< T extends Callable<?> > {
 
@@ -91,7 +91,7 @@ public abstract class AsyncService< T extends Callable<?> > {
      */
     public boolean addCommand( T command ) throws IllegalStateException
     {
-        // Vérifie si la commande est déjà dans la FIFO
+        // Checks if the order is already in the FIFO
         if( this.isInFifo( command ) )
         {
             this.logger.debug("{}{} La commande ({}) est déjà dans la FIFO (total : {}) : {}",
@@ -101,11 +101,11 @@ public abstract class AsyncService< T extends Callable<?> > {
 
         // Ajout de l'identifiant uniquement
         this.fifo.add( command );
-        // La liste sert à visuliser les commandes dèjà dans la FIFO
+        // The list is used to view the orders already in the FIFO
         this.toAnalyseCommand.add( command );
 
 
-        this.logger.debug("La liste de commande dans la FIFO (total : {}) : {}",
+        this.logger.debug("The order list in the FIFO (total : {}) : {}",
                 this.toAnalyseCommand.size(), this.toAnalyseCommand);
         return true;
     }
@@ -257,12 +257,5 @@ public abstract class AsyncService< T extends Callable<?> > {
         return new ArrayList<>( this.toAnalyseCommand );
     }
 
-//    public void setLoggerServiceName( String serviceName ){
-//        this.ASYNC = LogUtil.formatName( serviceName );
-//    }
-//
-//    public void setLoggerSubServiceName( String subServiceName ){
-//        EXECUTOR = LogUtil.formatName( subServiceName );
-//    }
 
 }

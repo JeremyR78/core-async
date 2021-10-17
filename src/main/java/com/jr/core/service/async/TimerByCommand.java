@@ -21,8 +21,6 @@ public class TimerByCommand implements Serializable {
     private final List<Date>  counterDateList;
 
 
-
-
     // --------------------------------------
     // -        Constructors                -
     // --------------------------------------
@@ -51,7 +49,7 @@ public class TimerByCommand implements Serializable {
     // --------------------------------------
 
     /**
-     * Ajout d'une nouvelle commande et valide le nombre
+     * Add a new order and validate the number
      *
      * @return
      */
@@ -63,8 +61,8 @@ public class TimerByCommand implements Serializable {
     }
 
     /**
-     * Ajout d'une nouvelle commande et valide le nombre
-     * Block le temps à attendre
+     * Add a new order and validate the number
+     * Block the time to wait
      */
     public void checkCommandAndValidBlock()
     {
@@ -76,8 +74,7 @@ public class TimerByCommand implements Serializable {
     }
 
     /**
-     * Incrémentation du compteur de commande
-     *
+     * Incrementing the command counter
      */
     public void setNewCommand()
     {
@@ -86,25 +83,24 @@ public class TimerByCommand implements Serializable {
     }
 
     /**
-     *  Suppresion des anciennes commandes
+     *  Deletion of old orders
      */
     public void check()
     {
         Date obsoleteDate         = this.getObsoleteDate();
         List<Date> dateToRemove   = new ArrayList<>();
 
-        // Vérification de la liste
-        for( Date dateCommand : this.counterDateList )
-        {
+        // Checking the list
+        for( Date dateCommand : this.counterDateList ) {
             if( obsoleteDate.after( dateCommand ) ) {
                 dateToRemove.add( dateCommand );
             }
         }
 
-        this.getLogger().debug("{}{} Date d'obsolescence : {} -> Date de commande(s) en amont à supprimer : {} . Toutes les autres dates : {} ",
+        this.getLogger().debug("{}{} Obsolescence date : {} -> Upstream order(s) date to be deleted : {} . All other dates : {} ",
                 COMMAND, CHECK, obsoleteDate, dateToRemove, this.counterDateList );
 
-        // Suppression des dates obsoletes
+        // Removal of obsolete dates
         this.counterDateList.removeAll( dateToRemove );
     }
 
@@ -139,7 +135,7 @@ public class TimerByCommand implements Serializable {
 
 
     /**
-     * Nombre de commande
+     * Order number
      * @return
      */
     public int getSize( )
@@ -148,7 +144,7 @@ public class TimerByCommand implements Serializable {
     }
 
     /**
-     * Le nombre de commande est inférieur à celui autorisée
+     * The number of orders is less than authorized
      *
      * @return
      */
@@ -156,18 +152,17 @@ public class TimerByCommand implements Serializable {
     {
         if( this.getSize() >= this.numberOfCommand )
         {
-            this.getLogger().debug("{}{} Le nombre maximum de commande sur un temps donnée est atteind ! Nombre de commande : {} ! Nombre de commande autorisée {}  ",
+            this.getLogger().debug("{}{} The maximum number of commands over a given time is reached ! Order number : {} ! Number of authorized orders {}  ",
                     COMMAND, VALID, this.getSize(), this.numberOfCommand);
             return false;
         }
-        this.getLogger().debug("{}{} Nombre de commande : {} ! Nombre de commande autorisée {}  ",
+        this.getLogger().debug("{}{} Order number : {} ! Number of authorized orders {}  ",
                 COMMAND, VALID, this.getSize(), this.numberOfCommand);
         return true;
     }
 
     /**
-     * Attend le temps minimum entre la première commande et la date limite
-     *
+     * Wait for the minimum time between the first order and the deadline
      */
     public void getWaitTime()
     {
@@ -190,16 +185,12 @@ public class TimerByCommand implements Serializable {
                 // Cancel
             }
         }
-        else
-        {
-
-        }
     }
 
 
     /**
-     * Le logger
-     * @return
+     * The logger
+     * @return Logger
      */
     protected Logger getLogger()
     {

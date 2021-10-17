@@ -1,6 +1,6 @@
 package com.jr.core.common.async;
 
-import static com.jr.core.utils.log.LogUtil.fLog;
+import static com.jr.core.common.logs.LogUtil.fLog;
 
 public final class CoreAsyncNameSpace {
 
@@ -18,6 +18,9 @@ public final class CoreAsyncNameSpace {
     public static final String RUN             = fLog("RUN");
     public static final String STOP            = fLog("STOP");
     public static final String FAIL            = fLog("FAIL");
+
+    public static final String ASYNC           = fLog("ASYNC_SERVICE");
+    public static final String EXECUTOR        = fLog("EXECUTOR");
     
     
     private CoreAsyncNameSpace(){}

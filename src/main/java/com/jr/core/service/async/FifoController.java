@@ -1,6 +1,6 @@
 package com.jr.core.service.async;
 
-import com.jr.core.utils.log.LogUtil;
+import com.jr.core.common.logs.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

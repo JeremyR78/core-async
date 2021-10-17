@@ -1,8 +1,13 @@
 package com.jr.core.service.async;
 
+import lombok.Data;
+import lombok.ToString;
+
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
+@Data
+@ToString
 public class TimeOutCommand implements Serializable {
 
     // --------------------------------------
@@ -12,24 +17,5 @@ public class TimeOutCommand implements Serializable {
     private final Integer   unitTime;
     private final TimeUnit  timeConvert;
 
-    // --------------------------------------
-    // -        Constructors                -
-    // --------------------------------------
 
-    public TimeOutCommand( Integer unitTime, TimeUnit timeConvert ) {
-        this.unitTime       = unitTime;
-        this.timeConvert    = timeConvert;
-    }
-
-    // --------------------------------------
-    // -        Methods                     -
-    // --------------------------------------
-
-    public Integer getUnitTime() {
-        return unitTime;
-    }
-
-    public TimeUnit getTimeConvert() {
-        return timeConvert;
-    }
 }

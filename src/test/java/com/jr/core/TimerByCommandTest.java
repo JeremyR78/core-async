@@ -2,7 +2,6 @@ package com.jr.core;
 
 
 import com.jr.core.service.async.TimerByCommand;
-import com.jr.core.utils.date.DateUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +41,7 @@ class TimerByCommandTest {
 
         Date secondDate = new Date();
 
-        long timeDiff = DateUtils.getDiffBetweenTwoDate( firstDate, secondDate );
+        long timeDiff = secondDate.getTime() - firstDate.getTime();
 
         System.out.println( String.format("First date : %s - Second date : %s => Diff : %s ms ",
                 firstDate, secondDate, timeDiff ) );

@@ -1,8 +1,11 @@
 package com.jr.core.service.async;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+@Data
 public class TimerCommand implements Serializable {
 
     // --------------------------------------
@@ -13,43 +16,11 @@ public class TimerCommand implements Serializable {
     private final Integer   unitTime;
     private final TimeUnit  timeConvert;
 
-    // --------------------------------------
-    // -        Constructors                -
-    // --------------------------------------
-
-    /**
-     *
-     * @param numberOfCommand : Nombre de commande à exécuter dans le temps impartis
-     * @param unitTime        : L'unité
-     * @param timeConvert     : L'échelle de temps
-     */
-    public TimerCommand(Integer numberOfCommand, Integer unitTime, TimeUnit timeConvert )
-    {
-        this.numberOfCommand    = numberOfCommand;
-        this.unitTime           = unitTime;
-        this.timeConvert        = timeConvert;
-    }
 
     // --------------------------------------
     // -        Methods                     -
     // --------------------------------------
 
-
-    public Integer getNumberOfCommand() {
-        return numberOfCommand;
-    }
-
-    public Integer getUnitTime() {
-        return unitTime;
-    }
-
-    public TimeUnit getTimeConvert() {
-        return timeConvert;
-    }
-
-    public long getToMillisecond(){
-        return this.timeConvert.convert( this.getUnitTime(), TimeUnit.MILLISECONDS );
-    }
 
     @Override
     public boolean equals(Object o) {

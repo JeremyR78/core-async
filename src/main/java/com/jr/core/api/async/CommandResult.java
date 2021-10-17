@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import java.io.Serializable;
 
 @Data
-@RequiredArgsConstructor
 public class CommandResult< T extends Serializable > implements ICommandResult<T> {
 
     // --------------------------------------
@@ -18,6 +17,5 @@ public class CommandResult< T extends Serializable > implements ICommandResult<T
     private final ICommand<T> command;
     private final CommandResultStatus commandResultStatus;
     private final T result;
-
 
 }
