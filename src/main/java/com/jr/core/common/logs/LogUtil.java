@@ -1,12 +1,12 @@
 package com.jr.core.common.logs;
 
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class LogUtil {
-
 
     // --------------------------------------
     // -    ATTRIBUTES                      -
@@ -20,6 +20,7 @@ public final class LogUtil {
 
     public static final Pattern REGEX_TAG_FOUND = Pattern.compile("\\"+START_TAG_SERVICE+"(;*?)\\"+END_TAG_SERVICE);
 
+
     private LogUtil(){}
 
     // --------------------------------------
@@ -27,45 +28,34 @@ public final class LogUtil {
     // --------------------------------------
 
     /**
-     * Formatage des données à logger
-     *
-     * @param summary : Le résumé du log
-     * @return
+     * Formatting of data to be logged
      */
     public static String format( String service, String subservice, String summary )
     {
         summary = validSizeSummary( summary );
         summary = replaceCharReturn( summary );
-        return String.format("%s%s%s%s%s%s %s %s %s",
-                START_TAG_SERVICE, service, END_TAG_SERVICE,
-                START_TAG_SERVICE, subservice, END_TAG_SERVICE,
+        return String.format("%s%s %s %s %s",
+                fLog(service),
+                fLog(subservice),
                 START_TAG_SUMMARY, summary, END_TAG_SUMMARY);
     }
 
     /**
-     * Formatage des données à logger
-     *
-     * @param summary : Le résumé du log
-     * @param content : La description
-     * @return
+     * Formatting of data to be logged
      */
     public static String format( String service, String subservice, String summary, String content )
     {
         summary = validSizeSummary( summary );
         summary = replaceCharReturn( summary );
-        return String.format("%s%s%s%s%s%s %s %s %s %s",
-                START_TAG_SERVICE, service, END_TAG_SERVICE,
-                START_TAG_SERVICE, subservice, END_TAG_SERVICE,
+        return String.format("%s%s %s %s %s %s",
+                fLog(service),
+                fLog(subservice),
                 START_TAG_SUMMARY, summary, END_TAG_SUMMARY,
                 replaceCharReturn( content ));
     }
 
     /**
-     * Formatage des données à logger
-     *
-     * @param summary   : Le résumé du log
-     * @param exception : L'exception à logger
-     * @return
+     * Formatting of data to be logged
      */
     public static String format( String service, String subservice, String summary, Throwable exception )
     {
@@ -74,9 +64,9 @@ public final class LogUtil {
         if( exception == null ) {
             return format( service, subservice, summary );
         }
-        return String.format("%s%s%s%s%s%s %s %s %s EXCEPTION : %s - CAUSE : %s - DETAILS : %s",
-                START_TAG_SERVICE, service, END_TAG_SERVICE,
-                START_TAG_SERVICE, subservice, END_TAG_SERVICE,
+        return String.format("%s%s %s %s %s EXCEPTION : %s - CAUSE : %s - DETAILS : %s",
+                fLog(service),
+                fLog(subservice),
                 START_TAG_SUMMARY, summary, END_TAG_SUMMARY,
                 replaceCharReturn( exception.toString() ),
                 replaceCharReturn( findFirstMessageCause( exception ) ),
@@ -84,12 +74,7 @@ public final class LogUtil {
     }
 
     /**
-     * Formatage des données à logger
-     *
-     * @param summary : Le résumé du log
-     * @param content : La description
-     * @param exception  : L'exception à logger
-     * @return
+     * Formatting of data to be logged
      */
     public static String format( String service, String subservice, String summary, String content, Throwable exception )
     {
@@ -98,9 +83,9 @@ public final class LogUtil {
         if( exception == null ){
             return format( service, subservice, summary, content );
         }
-        return String.format("%s%s%s%s%s%s %s %s %s %s -- EXCEPTION : %s - CAUSE : %s - DETAILS : %s",
-                START_TAG_SERVICE, service, END_TAG_SERVICE,
-                START_TAG_SERVICE, subservice, END_TAG_SERVICE,
+        return String.format("%s%s %s %s %s %s -- EXCEPTION : %s - CAUSE : %s - DETAILS : %s",
+                fLog(service),
+                fLog(subservice),
                 START_TAG_SUMMARY, summary, END_TAG_SUMMARY,
                 replaceCharReturn( content ),
                 replaceCharReturn( exception.toString() ),
@@ -108,11 +93,7 @@ public final class LogUtil {
                 findFirstStackTraceCause( exception ));
     }
 
-    /**
-     *
-     * @param exception
-     * @return
-     */
+
     public static String formatException( Throwable exception )
     {
         if( exception == null ){
@@ -125,10 +106,10 @@ public final class LogUtil {
     }
 
     /**
-     * La taille de la chaine de caractère
+     * The size of the string
      *
-     * @param testSize : La chaine de caractère
-     * @param sizeMax  : La taille à respecter
+     * @param testSize : content
+     * @param sizeMax  : The size to respect
      * @return
      */
     public static boolean sizeString( String testSize, int sizeMax )
@@ -142,8 +123,8 @@ public final class LogUtil {
     }
 
     /**
-     * Vérification de la taille du résumé.
-     * Coupe la chaine de caratère si celle-ci est trop longue
+     * Checking the size of the summary.
+     * Cut the chain of characters if it is too long
      *
      * @param summary
      */
@@ -162,7 +143,7 @@ public final class LogUtil {
     }
 
     /**
-     * Retire les retours à la ligne d'un texte
+     * Remove line breaks from text
      * @param text
      * @return
      */
@@ -191,7 +172,7 @@ public final class LogUtil {
     }
 
     /**
-     * Récupére la première StackTrace
+     * Get the first StackTrace
      * @param throwable
      * @return
      */
@@ -208,7 +189,7 @@ public final class LogUtil {
     }
 
     /**
-     * Récupére le premier message d'exception
+     * Get the first exception message
      * @param throwable
      * @return
      */
