@@ -5,7 +5,7 @@ import static com.jr.core.common.logs.LogUtil.fLog;
 public final class CoreAsyncNameSpace {
 
     public static final String UPDATE_WALLET    = fLog("UPDATE_WALLET");
-    public static final String COMMAND          = fLog("COMMAND");
+    public static final String TASK             = fLog("TASK");
     public static final String START            = fLog("START");
     public static final String FINISH           = fLog("FINISH");
 
@@ -21,7 +21,6 @@ public final class CoreAsyncNameSpace {
 
     public static final String ASYNC           = fLog("ASYNC_SERVICE");
     public static final String EXECUTOR        = fLog("EXECUTOR");
-    
     
     private CoreAsyncNameSpace(){}
 }

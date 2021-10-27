@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.jr.core.common.async.CoreAsyncNameSpace.*;
 
-public class TimerByCommand implements Serializable {
+public class TimerByTask implements Serializable {
 
     // --------------------------------------
     // -        Attributes                  -
@@ -30,14 +30,14 @@ public class TimerByCommand implements Serializable {
      * @param numberOfCommand
      * @param timeInMillisecond
      */
-    public TimerByCommand( int numberOfCommand, long timeInMillisecond )
+    public TimerByTask(int numberOfCommand, long timeInMillisecond )
     {
         this.counterDateList    = new ArrayList<>();
         this.numberOfCommand    = numberOfCommand;
         this.timeInMillisecond  = timeInMillisecond;
     }
 
-    public TimerByCommand(int numberOfCommand, long time, TimeUnit timeUnit )
+    public TimerByTask(int numberOfCommand, long time, TimeUnit timeUnit )
     {
         this.counterDateList    = new ArrayList<>();
         this.numberOfCommand    = numberOfCommand;
@@ -98,7 +98,7 @@ public class TimerByCommand implements Serializable {
         }
 
         this.getLogger().debug("{}{} Obsolescence date : {} -> Upstream order(s) date to be deleted : {} . All other dates : {} ",
-                COMMAND, CHECK, obsoleteDate, dateToRemove, this.counterDateList );
+                TASK, CHECK, obsoleteDate, dateToRemove, this.counterDateList );
 
         // Removal of obsolete dates
         this.counterDateList.removeAll( dateToRemove );
@@ -153,11 +153,11 @@ public class TimerByCommand implements Serializable {
         if( this.getSize() >= this.numberOfCommand )
         {
             this.getLogger().debug("{}{} The maximum number of commands over a given time is reached ! Order number : {} ! Number of authorized orders {}  ",
-                    COMMAND, VALID, this.getSize(), this.numberOfCommand);
+                    TASK, VALID, this.getSize(), this.numberOfCommand);
             return false;
         }
         this.getLogger().debug("{}{} Order number : {} ! Number of authorized orders {}  ",
-                COMMAND, VALID, this.getSize(), this.numberOfCommand);
+                TASK, VALID, this.getSize(), this.numberOfCommand);
         return true;
     }
 
@@ -174,7 +174,7 @@ public class TimerByCommand implements Serializable {
             long diffInMillies = Math.abs(  dateLimit.getTime() - now.getTime() );
 
             this.getLogger().debug( "{}{} Temps à attendre avant la prochaine commande : {} ms. Date actuelle : {} - Date limite : {}",
-                    COMMAND, WAIT, diffInMillies, now, dateLimit );
+                    TASK, WAIT, diffInMillies, now, dateLimit );
 
             try {
                 // Attend

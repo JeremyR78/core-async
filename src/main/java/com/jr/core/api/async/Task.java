@@ -1,6 +1,6 @@
 package com.jr.core.api.async;
 
-import com.jr.core.common.async.CommandResultStatus;
+import com.jr.core.common.async.TaskResultStatus;
 import com.jr.core.service.async.Observable;
 import lombok.*;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public abstract class Command<T> extends Observable implements ICommand<T>, Serializable {
+public abstract class Task<T> extends Observable implements ITask<T>, Serializable {
 
     // --------------------------------------
     // -        Attributes                  -
@@ -29,7 +29,7 @@ public abstract class Command<T> extends Observable implements ICommand<T>, Seri
     private final transient Logger logger   = LoggerFactory.getLogger(getClass());
     private final List<String> message      = new ArrayList<>();
     @Setter(AccessLevel.PROTECTED)
-    private CommandResultStatus status;
+    private TaskResultStatus status;
     @Setter(AccessLevel.PROTECTED)
     private T result;
     private int percent = 0;

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 @Data
 @ToString
-public class TimeOutCommand implements Serializable {
+public class TimeOutTask implements Serializable {
 
     // --------------------------------------
     // -        Attributes                  -

@@ -1,11 +1,11 @@
 package com.jr.core;
 
-import com.jr.core.common.async.CommandResultStatus;
+import com.jr.core.common.async.TaskResultStatus;
 import com.jr.core.mock.AsyncServiceMock;
-import com.jr.core.mock.CommandMock;
+import com.jr.core.mock.TaskMock;
 import com.jr.core.service.async.FifoController;
-import com.jr.core.service.async.TimeOutCommand;
-import com.jr.core.service.async.TimerCommand;
+import com.jr.core.service.async.TimeOutTask;
+import com.jr.core.service.async.TimerTask;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,23 +32,23 @@ class AsyncServiceTest {
 
     @Test
     @Order(10)
-    void addCommand() throws InterruptedException {
+    void addTask() throws InterruptedException {
 
         //
         // - PREPARE TEST
         //
 
-        CommandMock commandMock = new CommandMock( 1 );
-        List<TimerCommand> timerCommandList = Collections.singletonList(new TimerCommand(1, 200, TimeUnit.MILLISECONDS));
+        TaskMock taskMock = new TaskMock( 1 );
+        List<TimerTask> timerTaskList = Collections.singletonList(new TimerTask(1, 200, TimeUnit.MILLISECONDS));
 
-        final AsyncServiceMock asyncServiceMock = new AsyncServiceMock( timerCommandList );
-        asyncServiceMock.addCommand( commandMock );
+        final AsyncServiceMock asyncServiceMock = new AsyncServiceMock(timerTaskList);
+        asyncServiceMock.addTask( taskMock );
 
         //
         // - TEST
         //
 
-        boolean isInFifo = asyncServiceMock.isInFifo( commandMock );
+        boolean isInFifo = asyncServiceMock.isInFifo( taskMock );
         Assertions.assertTrue( isInFifo );
 
         boolean isStopped = asyncServiceMock.isStopped();
@@ -59,7 +59,7 @@ class AsyncServiceTest {
 
         Thread t = asyncServiceMock.executorAsynchronously();
 
-        // La commande (mock) s'éxecute en 500 ms
+        // The task (mock) is executed in 500 ms
         Thread.sleep( 100 ); // 100 ms
 
         int size2 = asyncServiceMock.getSizeFifo();
@@ -68,7 +68,7 @@ class AsyncServiceTest {
         boolean isStopped2 = asyncServiceMock.isStopped();
         Assertions.assertFalse( isStopped2 );
 
-        // On attend la fin du thread
+        // We wait for the end of the thread
         t.join();
 
         boolean isStopped3 = asyncServiceMock.isStopped();
@@ -78,17 +78,17 @@ class AsyncServiceTest {
         // Try restart
         //
 
-        asyncServiceMock.addCommand( commandMock );
+        asyncServiceMock.addTask( taskMock );
 
         Thread t2 = asyncServiceMock.executorAsynchronously();
 
-        // La commande (mock) s'éxecute en 500 ms
+        // The task (mock) is executed in 500 ms
         Thread.sleep( 100 ); // 100 ms
 
         boolean isStopped4 = asyncServiceMock.isStopped();
         Assertions.assertFalse( isStopped4 );
 
-        // On attend la fin du thread
+        // We wait for the end of the thread
         t2.join();
 
         boolean isStopped5 = asyncServiceMock.isStopped();
@@ -108,23 +108,23 @@ class AsyncServiceTest {
         // Init
         int maxThread = 2;
 
-        CommandMock commandMock1 = new CommandMock( 1 );
-        CommandMock commandMock2 = new CommandMock( 2 );
-        CommandMock commandMock3 = new CommandMock( 3 );
-        CommandMock commandMock4 = new CommandMock( 4 );
-        CommandMock commandMock5 = new CommandMock( 5 );
-        CommandMock commandMock6 = new CommandMock( 6 );
+        TaskMock commandMock1 = new TaskMock( 1 );
+        TaskMock commandMock2 = new TaskMock( 2 );
+        TaskMock commandMock3 = new TaskMock( 3 );
+        TaskMock commandMock4 = new TaskMock( 4 );
+        TaskMock commandMock5 = new TaskMock( 5 );
+        TaskMock commandMock6 = new TaskMock( 6 );
 
-        List<CommandMock> commandMockList = Arrays.asList( commandMock1, commandMock2, commandMock3, commandMock4,
+        List<TaskMock> commandMockList = Arrays.asList( commandMock1, commandMock2, commandMock3, commandMock4,
                 commandMock5, commandMock6 );
 
-        int waitOrderExecution = commandMockList.stream().map(CommandMock::getWait)
+        int waitOrderExecution = commandMockList.stream().map(TaskMock::getWait)
                 .reduce(0, Integer::sum) / maxThread ;
 
         AsyncServiceMock asyncServiceMock = new AsyncServiceMock( maxThread, null, null );
 
-        for( CommandMock commandMockItem : commandMockList ){
-            asyncServiceMock.addCommand( commandMockItem );
+        for( TaskMock commandMockItem : commandMockList ){
+            asyncServiceMock.addTask( commandMockItem );
         }
 
         // Test
@@ -140,8 +140,8 @@ class AsyncServiceTest {
         }
 
         // Check is the thread have completed correctly
-        for( CommandMock commandMockItem : commandMockList ){
-            Assertions.assertEquals( CommandResultStatus.OK, commandMockItem.getStatus(),
+        for( TaskMock commandMockItem : commandMockList ){
+            Assertions.assertEquals( TaskResultStatus.OK, commandMockItem.getStatus(),
                     String.format( "The order %s did not complete correctly !",
                             commandMockItem.getNumber() ) );
         }
@@ -160,22 +160,22 @@ class AsyncServiceTest {
         // Init
         int maxThread = 1;
 
-        CommandMock commandMock1 = new CommandMock( 1 );
-        CommandMock commandMock2 = new CommandMock( 2 );
-        CommandMock commandMock3 = new CommandMock( 3 );
-        CommandMock commandMock4 = new CommandMock( 4 );
-        CommandMock commandMock5 = new CommandMock( 5 );
-        CommandMock commandMock6 = new CommandMock( 6 );
+        TaskMock taskMock1 = new TaskMock( 1 );
+        TaskMock taskMock2 = new TaskMock( 2 );
+        TaskMock taskMock3 = new TaskMock( 3 );
+        TaskMock taskMock4 = new TaskMock( 4 );
+        TaskMock taskMock5 = new TaskMock( 5 );
+        TaskMock taskMock6 = new TaskMock( 6 );
 
-        List<CommandMock> commandMockList = Arrays.asList( commandMock1, commandMock2, commandMock3, commandMock4,
-                commandMock5, commandMock6 );
+        List<TaskMock> taskMockList = Arrays.asList( taskMock1, taskMock2, taskMock3, taskMock4,
+                taskMock5, taskMock6 );
 
-        int waitOrderExecution = commandMockList.stream().map(CommandMock::getWait).reduce(0, Integer::sum) / maxThread ;
+        int waitOrderExecution = taskMockList.stream().map(TaskMock::getWait).reduce(0, Integer::sum) / maxThread ;
 
         AsyncServiceMock asyncServiceMock = new AsyncServiceMock( maxThread, null, null );
 
-        for( CommandMock commandMockItem : commandMockList ){
-            asyncServiceMock.addCommand( commandMockItem );
+        for( TaskMock taskMockItem : taskMockList ){
+            asyncServiceMock.addTask( taskMockItem );
         }
 
         // Test
@@ -192,16 +192,16 @@ class AsyncServiceTest {
         }
 
         // Check is the thread have completed correctly
-        for( CommandMock commandMockItem : commandMockList ){
-            Assertions.assertEquals( CommandResultStatus.OK, commandMockItem.getStatus(),
+        for( TaskMock taskMockItem : taskMockList ){
+            Assertions.assertEquals( TaskResultStatus.OK, taskMockItem.getStatus(),
                     String.format("The order %s did not complete correctly !",
-                            commandMockItem.getNumber() )
+                            taskMockItem.getNumber() )
                     );
         }
     }
 
     /**
-     * Checking that the timeout of one command does not impact the following ones
+     * Checking that the timeout of one task does not impact the following ones
      *
      * @throws InterruptedException
      */
@@ -213,26 +213,26 @@ class AsyncServiceTest {
         // Init
         int maxThread = 2;
 
-        CommandMock commandMock1 = new CommandMock( 1, 100 );
-        CommandMock commandMock2 = new CommandMock( 2, 3500 );
-        CommandMock commandMock3 = new CommandMock( 3, 100 );
-        CommandMock commandMock4 = new CommandMock( 4, 100 );
-        CommandMock commandMock5 = new CommandMock( 5, 100 );
-        CommandMock commandMock6 = new CommandMock( 6, 100 );
-        CommandMock commandMock7 = new CommandMock( 7, 100 );
+        TaskMock taskMock1 = new TaskMock( 1, 100 );
+        TaskMock taskMock2 = new TaskMock( 2, 3500 );
+        TaskMock taskMock3 = new TaskMock( 3, 100 );
+        TaskMock taskMock4 = new TaskMock( 4, 100 );
+        TaskMock taskMock5 = new TaskMock( 5, 100 );
+        TaskMock taskMock6 = new TaskMock( 6, 100 );
+        TaskMock taskMock7 = new TaskMock( 7, 100 );
 
-        List<CommandMock> commandMockList = Arrays.asList( commandMock1, commandMock2,  commandMock3, commandMock4,
-                commandMock5, commandMock6, commandMock7);
+        List<TaskMock> taskMockList = Arrays.asList( taskMock1, taskMock2,  taskMock3, taskMock4,
+                taskMock5, taskMock6, taskMock7);
 
-        TimeOutCommand timeOutCommand = new TimeOutCommand(2000, TimeUnit.MILLISECONDS);
+        TimeOutTask timeOutTask = new TimeOutTask(2000, TimeUnit.MILLISECONDS);
 
-        int waitOrderExecution = commandMockList.stream().map(CommandMock::getWait)
+        int waitOrderExecution = taskMockList.stream().map(TaskMock::getWait)
                 .reduce(0, Integer::sum) / maxThread;
 
-        AsyncServiceMock asyncServiceMock = new AsyncServiceMock( maxThread, null, timeOutCommand );
+        AsyncServiceMock asyncServiceMock = new AsyncServiceMock( maxThread, null, timeOutTask);
 
-        for( CommandMock commandMockItem : commandMockList ){
-            asyncServiceMock.addCommand( commandMockItem );
+        for( TaskMock taskMockItem : taskMockList ){
+            asyncServiceMock.addTask( taskMockItem );
         }
 
         // Test
@@ -248,13 +248,13 @@ class AsyncServiceTest {
             Assertions.fail("The controller took too long to stop !");
         }
 
-        for( CommandMock commandMockItem : commandMockList ){
-            if( commandMockItem.getNumber() == 2 ){
-                Assertions.assertNotEquals( CommandResultStatus.OK, commandMockItem.getStatus(),
-                        String.format("The order %s should not have completed correctly!", commandMockItem.getNumber() ));
+        for( TaskMock taskMockItem : taskMockList ){
+            if( taskMockItem.getNumber() == 2 ){
+                Assertions.assertNotEquals( TaskResultStatus.OK, taskMockItem.getStatus(),
+                        String.format("The order %s should not have completed correctly!", taskMockItem.getNumber() ));
             } else {
-                Assertions.assertEquals( CommandResultStatus.OK, commandMockItem.getStatus(),
-                        String.format("The order %s did not complete correctly !", commandMockItem.getNumber() ));
+                Assertions.assertEquals( TaskResultStatus.OK, taskMockItem.getStatus(),
+                        String.format("The order %s did not complete correctly !", taskMockItem.getNumber() ));
             }
         }
 
@@ -267,25 +267,25 @@ class AsyncServiceTest {
         int maxThread = 1;
         int waitBetweenOrder = 300; // ms
 
-        CommandMock commandMock1 = new CommandMock( 1, 100 );
-        CommandMock commandMock2 = new CommandMock( 2, 100 );
-        CommandMock commandMock3 = new CommandMock( 3, 100 );
-        CommandMock commandMock4 = new CommandMock( 4, 100 );
+        TaskMock taskMock1 = new TaskMock( 1, 100 );
+        TaskMock taskMock2 = new TaskMock( 2, 100 );
+        TaskMock taskMock3 = new TaskMock( 3, 100 );
+        TaskMock taskMock4 = new TaskMock( 4, 100 );
 
-        List<CommandMock> commandMockList = Arrays.asList( commandMock1, commandMock2,  commandMock3, commandMock4 );
+        List<TaskMock> taskMockList = Arrays.asList( taskMock1, taskMock2,  taskMock3, taskMock4 );
 
-        TimeOutCommand timeOutCommand = new TimeOutCommand(2000, TimeUnit.MILLISECONDS);
+        TimeOutTask timeOutTask = new TimeOutTask(2000, TimeUnit.MILLISECONDS);
 
-        List<TimerCommand> timerByCommandList = Arrays.asList( new TimerCommand( 1, waitBetweenOrder, TimeUnit.MILLISECONDS ) );
+        List<TimerTask> timerBytaskList = Arrays.asList( new TimerTask( 1, waitBetweenOrder, TimeUnit.MILLISECONDS ) );
 
-        int waitOrderExecution = ( commandMockList.stream().map(CommandMock::getWait)
-                .reduce(0, Integer::sum) + (500 * commandMockList.size()))
+        int waitOrderExecution = ( taskMockList.stream().map(TaskMock::getWait)
+                .reduce(0, Integer::sum) + (500 * taskMockList.size()))
                 / maxThread;
 
-        AsyncServiceMock asyncServiceMock = new AsyncServiceMock( maxThread, timerByCommandList, timeOutCommand );
+        AsyncServiceMock asyncServiceMock = new AsyncServiceMock( maxThread, timerBytaskList, timeOutTask);
 
-        for( CommandMock commandMockItem : commandMockList ){
-            asyncServiceMock.addCommand( commandMockItem );
+        for( TaskMock taskMockItem : taskMockList ){
+            asyncServiceMock.addTask( taskMockItem );
         }
 
         // Test
@@ -302,12 +302,12 @@ class AsyncServiceTest {
         }
 
         Date first = null;
-        for( CommandMock commandMockItem : commandMockList ){
-            Date dateNextOrder = commandMockItem.getStart();
+        for( TaskMock taskMockItem : taskMockList ){
+            Date dateNextOrder = taskMockItem.getStart();
             if( first != null ) {
                 long timeMillisecondDiff = dateNextOrder.getTime() - first.getTime();
-                this.logger.info("The diff between order {} & {} is : {} ms", commandMockItem.getNumber() -1 ,
-                        commandMockItem.getNumber(), timeMillisecondDiff );
+                this.logger.info("The diff between order {} & {} is : {} ms", taskMockItem.getNumber() -1 ,
+                        taskMockItem.getNumber(), timeMillisecondDiff );
                 Assertions.assertTrue( timeMillisecondDiff >= waitBetweenOrder );
             }
             first = dateNextOrder;
@@ -322,18 +322,18 @@ class AsyncServiceTest {
         // Init
         int maxThread = 1;
 
-        CommandMock commandMock1 = new CommandMock( 1, FifoController.TIME_OUT_MAX_FIFO );
-        CommandMock commandMock2 = new CommandMock( 2, 1000 );
+        TaskMock taskMock1 = new TaskMock( 1, FifoController.TIME_OUT_MAX_FIFO );
+        TaskMock taskMock2 = new TaskMock( 2, 1000 );
 
-        List<CommandMock> commandMockList = Arrays.asList( commandMock1, commandMock2 );
+        List<TaskMock> taskMockList = Arrays.asList( taskMock1, taskMock2 );
 
-        int waitOrderExecution = commandMockList.stream().map(CommandMock::getWait)
+        int waitOrderExecution = taskMockList.stream().map(TaskMock::getWait)
                 .reduce(0, Integer::sum) / maxThread;
 
         AsyncServiceMock asyncServiceMock = new AsyncServiceMock( maxThread, null, null );
 
-        for( CommandMock commandMockItem : commandMockList ){
-            asyncServiceMock.addCommand( commandMockItem );
+        for( TaskMock taskMockItem : taskMockList ){
+            asyncServiceMock.addTask( taskMockItem );
         }
 
         // Test
@@ -342,7 +342,7 @@ class AsyncServiceTest {
 
         Thread.sleep( 200 );
 
-        // Stop the controller after the fist command
+        // Stop the controller after the fist task
         asyncServiceMock.stop();
 
         // Time for the controller to turn off
@@ -355,13 +355,13 @@ class AsyncServiceTest {
         }
 
         // Check
-        for( CommandMock commandMockItem : commandMockList ){
-            if( commandMockItem.getNumber() == 2 ){
-                Assertions.assertNotEquals( CommandResultStatus.OK, commandMockItem.getStatus(),
-                        String.format("The order %s should not have completed correctly!", commandMockItem.getNumber() ));
+        for( TaskMock taskMockItem : taskMockList ){
+            if( taskMockItem.getNumber() == 2 ){
+                Assertions.assertNotEquals( TaskResultStatus.OK, taskMockItem.getStatus(),
+                        String.format("The order %s should not have completed correctly!", taskMockItem.getNumber() ));
             } else {
-                Assertions.assertEquals( CommandResultStatus.OK, commandMockItem.getStatus(),
-                        String.format("The order %s did not complete correctly !", commandMockItem.getNumber() ));
+                Assertions.assertEquals( TaskResultStatus.OK, taskMockItem.getStatus(),
+                        String.format("The order %s did not complete correctly !", taskMockItem.getNumber() ));
             }
         }
     }

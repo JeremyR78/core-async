@@ -12,6 +12,7 @@ import java.util.concurrent.*;
 import static com.jr.core.common.async.CoreAsyncNameSpace.ASYNC;
 import static com.jr.core.common.async.CoreAsyncNameSpace.EXECUTOR;
 
+
 public abstract class AsyncService< T extends Callable<?> > {
 
 
@@ -26,19 +27,15 @@ public abstract class AsyncService< T extends Callable<?> > {
     private final Logger logger                                         = LoggerFactory.getLogger(getClass());
     private final ExecutorService executorController                    = Executors.newFixedThreadPool(NUMBER_OF_CONTROLLER);
     private final BlockingQueue<Callable<?>> fifo                       = new ArrayBlockingQueue<>(NUMBER_MAX_ELEMENT_IN_FIFO);
-    private final CopyOnWriteArrayList<Callable<?>> toAnalyseCommand    = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<Callable<?>> toAnalyseTask       = new CopyOnWriteArrayList<>();
 
     private FifoController fifoController;
     private boolean running;
 
-    private final List<TimerCommand> counterList;
-    private final TimeOutCommand timeOutCommand;
+    private final List<TimerTask> counterList;
+    private final TimeOutTask timeOutTask;
 
     private Future<?> futureOfFifoController;
-
-    // --------------------------------------
-    // -        Attributes  - SERVICE       -
-    // --------------------------------------
 
 
     // --------------------------------------
@@ -47,35 +44,35 @@ public abstract class AsyncService< T extends Callable<?> > {
 
     /**
      *
-     * @param timerCommandList : The list of timers to respect
+     * @param timerTaskList : The list of timers to respect
      */
-    protected AsyncService( List<TimerCommand> timerCommandList )
+    protected AsyncService( List<TimerTask> timerTaskList)
     {
-        this( 5, timerCommandList, null);
+        this( 5, timerTaskList, null);
     }
 
     /**
      *
      * @param maxThread : The number of threads executed in parallel
-     * @param timerCommandList : The list of timers to respect
-     * @param timeOutCommand : The maximum execution time of an order
+     * @param timerTaskList : The list of timers to respect
+     * @param timeOutTask : The maximum execution time of an order
      */
-    protected AsyncService( int maxThread, List<TimerCommand> timerCommandList, TimeOutCommand timeOutCommand )
+    protected AsyncService(int maxThread, List<TimerTask> timerTaskList, TimeOutTask timeOutTask)
     {
         this.numberMaxPoolThread = maxThread;
 
-        if( timeOutCommand == null ){
-            this.timeOutCommand = new TimeOutCommand( 5, TimeUnit.MINUTES );
+        if( timeOutTask == null ){
+            this.timeOutTask = new TimeOutTask( 5, TimeUnit.MINUTES );
         }
         else {
-            this.timeOutCommand = timeOutCommand;
+            this.timeOutTask = timeOutTask;
         }
 
-        if( timerCommandList == null ){
+        if( timerTaskList == null ){
             this.counterList = new ArrayList<>();
         }
         else {
-            this.counterList = timerCommandList;
+            this.counterList = timerTaskList;
         }
     }
 
@@ -85,31 +82,29 @@ public abstract class AsyncService< T extends Callable<?> > {
 
     /**
      *
-     * @param command : The order to add to the FIFO
+     * @param task : The order to add to the FIFO
      * @return False if the order is already in the Fifo otherwise True
      * @throws IllegalStateException : The fifo is full
      */
-    public boolean addCommand( T command ) throws IllegalStateException
+    public boolean addTask( T task ) throws IllegalStateException
     {
         // Checks if the order is already in the FIFO
-        if( this.isInFifo( command ) )
+        if( this.isInFifo( task ) )
         {
-            this.logger.debug("{}{} La commande ({}) est déjà dans la FIFO (total : {}) : {}",
-                    ASYNC, EXECUTOR, command, this.toAnalyseCommand.size(), this.toAnalyseCommand);
+            this.logger.debug("{}{} The task ({}) is already in the FIFO (total : {}) : {}",
+                    ASYNC, EXECUTOR, task, this.toAnalyseTask.size(), this.toAnalyseTask);
             return false;
         }
 
-        // Ajout de l'identifiant uniquement
-        this.fifo.add( command );
+        // Adding the identifier only
+        this.fifo.add( task );
         // The list is used to view the orders already in the FIFO
-        this.toAnalyseCommand.add( command );
-
+        this.toAnalyseTask.add( task );
 
         this.logger.debug("The order list in the FIFO (total : {}) : {}",
-                this.toAnalyseCommand.size(), this.toAnalyseCommand);
+                this.toAnalyseTask.size(), this.toAnalyseTask);
         return true;
     }
-
 
     /**
      * Start the order analysis controller
@@ -128,16 +123,16 @@ public abstract class AsyncService< T extends Callable<?> > {
             this.logger.info("{}{} Starting the scheduler",
                     ASYNC, EXECUTOR);
 
-            this.fifoController = new FifoController( this.fifo, this.toAnalyseCommand, numberMaxPoolThread);
+            this.fifoController = new FifoController( this.fifo, this.toAnalyseTask, numberMaxPoolThread);
 
-            // Ajout des Timers
-            for( TimerCommand timerCommand : this.counterList )
+            // Adding Timers
+            for( TimerTask timerCommand : this.counterList )
             {
                 this.fifoController.addCounter(timerCommand);
             }
 
             // Maximum time of a command execution
-            this.fifoController.setMaxTimerCommand( this.timeOutCommand );
+            this.fifoController.setMaxTimerCommand( this.timeOutTask);
 
             futureOfFifoController = this.executorController.submit( this.fifoController );
 
@@ -194,7 +189,6 @@ public abstract class AsyncService< T extends Callable<?> > {
         this.futureOfFifoController.get( time, timeUnit );
     }
 
-
     /**
      *
      * @return
@@ -216,9 +210,9 @@ public abstract class AsyncService< T extends Callable<?> > {
      */
     public boolean isInFifo( Callable<?> command )
     {
-        for( Callable<?> commandToAnalyse : this.toAnalyseCommand )
+        for( Callable<?> taskToAnalyse : this.toAnalyseTask)
         {
-            if( Objects.equals( commandToAnalyse, command ) )
+            if( Objects.equals( taskToAnalyse, command ) )
             {
                 return true;
             }
@@ -244,7 +238,7 @@ public abstract class AsyncService< T extends Callable<?> > {
         return NUMBER_MAX_ELEMENT_IN_FIFO;
     }
 
-    public List<TimerCommand> getCounterList() {
+    public List<TimerTask> getCounterList() {
         return new ArrayList<>(counterList);
     }
 
@@ -254,7 +248,7 @@ public abstract class AsyncService< T extends Callable<?> > {
      */
     public List<Callable<?>> getAllCommands()
     {
-        return new ArrayList<>( this.toAnalyseCommand );
+        return new ArrayList<>( this.toAnalyseTask);
     }
 
 

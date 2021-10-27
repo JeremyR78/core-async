@@ -1,6 +1,6 @@
 package com.jr.core.common.async;
 
-public enum CommandResultStatus {
+public enum TaskResultStatus {
     ERROR,
     FAIL_INIT,
     MISSING_PARAM,

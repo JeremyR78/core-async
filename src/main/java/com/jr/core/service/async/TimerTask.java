@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Data
-public class TimerCommand implements Serializable {
+public class TimerTask implements Serializable {
 
     // --------------------------------------
     // -        Attributes                  -
@@ -25,11 +25,11 @@ public class TimerCommand implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TimerCommand)) return false;
-        TimerCommand timerCommand = (TimerCommand) o;
-        return Objects.equals(getNumberOfCommand(), timerCommand.getNumberOfCommand()) &&
-                Objects.equals(getUnitTime(), timerCommand.getUnitTime()) &&
-                getTimeConvert() == timerCommand.getTimeConvert();
+        if (!(o instanceof TimerTask)) return false;
+        TimerTask timerTask = (TimerTask) o;
+        return Objects.equals(getNumberOfCommand(), timerTask.getNumberOfCommand()) &&
+                Objects.equals(getUnitTime(), timerTask.getUnitTime()) &&
+                getTimeConvert() == timerTask.getTimeConvert();
     }
 
     @Override

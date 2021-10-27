@@ -1,7 +1,7 @@
 package com.jr.core.mock;
 
-import com.jr.core.api.async.Command;
-import com.jr.core.common.async.CommandResultStatus;
+import com.jr.core.api.async.Task;
+import com.jr.core.common.async.TaskResultStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-public class CommandMock extends Command<Integer> {
+public class TaskMock extends Task<Integer> {
 
     // --------------------------------------
     // -        Attributes                  -
@@ -26,11 +26,11 @@ public class CommandMock extends Command<Integer> {
     @Getter @Setter(AccessLevel.PROTECTED)
     public Date end;
 
-    public CommandMock( Integer number ){
+    public TaskMock(Integer number ){
         this.number = number;
     }
 
-    public CommandMock( Integer number, int wait ){
+    public TaskMock(Integer number, int wait ){
         this.number = number;
         this.wait = wait;
     }
@@ -47,7 +47,7 @@ public class CommandMock extends Command<Integer> {
         this.setEnd( new Date() );
         this.logger.info("Order : {} - STOP : {} ", number, this.getEnd() );
         this.setResult( this.number );
-        this.setStatus( CommandResultStatus.OK );
+        this.setStatus( TaskResultStatus.OK );
         return this.number;
     }
 

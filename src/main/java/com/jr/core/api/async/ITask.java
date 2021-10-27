@@ -1,12 +1,12 @@
 package com.jr.core.api.async;
 
-import com.jr.core.common.async.CommandResultStatus;
+import com.jr.core.common.async.TaskResultStatus;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public interface ICommand<T> extends Callable<T>, Serializable {
+public interface ITask<T> extends Callable<T>, Serializable {
 
     List<String> getMessage();
 
@@ -14,7 +14,7 @@ public interface ICommand<T> extends Callable<T>, Serializable {
      * The status
      * @return
      */
-    CommandResultStatus getStatus();
+    TaskResultStatus getStatus();
 
     /**
      * The result of command

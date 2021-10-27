@@ -35,14 +35,13 @@ public class FifoController implements Runnable {
     protected volatile boolean stop                     = false;
     protected long maxTimeMillisByCommand               = 60 * 60 * 1000 ; // 1H00
 
-    protected List<TimerByCommand> timerList;
+    protected List<TimerByTask> timerList;
 
     // --------------------------------------
     // -        Constructors                -
     // --------------------------------------
 
     /**
-     *
      * @param fifo : The FIFO to read
      * @param toCurrentObject : The list of all the objects that are currently in the FIFO. This avoids duplicating existing ones.
      * @param maxPoolThread : The number of commands to be executed in parallel
@@ -81,7 +80,7 @@ public class FifoController implements Runnable {
                     // Execute the orders
                     future = executorService.submit( command );
 
-                    for( TimerByCommand  timer : this.timerList ) {
+                    for( TimerByTask timer : this.timerList ) {
                         // Increments counters
                         timer.setNewCommand();
                     }
@@ -92,9 +91,9 @@ public class FifoController implements Runnable {
                     this.executorServiceCheckout.execute(() -> checkTimeOutCommand( future, command ));
                 }
 
-                // Vérification des compteurs / timers
-                for( TimerByCommand  timer : this.timerList ) {
-                    // Vérification du compteur et block si nécessaire
+                // Checking the counters / timers
+                for( TimerByTask timer : this.timerList ) {
+                    // Checking the counter and block if necessary
                     timer.checkCommandAndValidBlock();
                 }
 
@@ -109,18 +108,18 @@ public class FifoController implements Runnable {
             }
         } catch ( InterruptedException e ) {
             int sizeCommand = fifo.size();
-            this.getLogger().warn("{}{}{} Le controleur a été interrompu ! {} message(s) n'ont pas été envoyé(s) !",
+            this.getLogger().warn("{}{}{} Controller has been interrupted ! {} message(s) have not been sent !",
                     FIFO_CONTROLLER, EXECUTE, STOP, sizeCommand );
         } catch (Exception ex) {
             int sizeCommand = fifo.size();
-            this.getLogger().error("{}{}{} Erreur durant l'éxecution du controleur ! {} message(s) n'ont pas été envoyé(s) ! MESSAGE : {} : {}",
+            this.getLogger().error("{}{}{} Error during controller execution ! {}  message(s) have not been sent ! MESSAGE : {} : {}",
                     FIFO_CONTROLLER, EXECUTE, FAIL, sizeCommand, ex.getMessage(), ex.getStackTrace() );
         } finally {
 
             // Wait for the last threads
             if( ! this.resultOrderWaiting.isEmpty() ) {
-                this.getLogger().info(LogUtil.format(FIFO_CONTROLLER, EXECUTE, "Le contrôleur attend les derniers Threads",
-                        String.format("The controller wait %s ms que les derniers Threads se terminent correctement",
+                this.getLogger().info(LogUtil.format(FIFO_CONTROLLER, EXECUTE, "The controller waits for the last Threads",
+                        String.format("The controller wait %s ms for the last Threads to complete successfully",
                                 TIME_OUT_MAX_FIFO )));
                 try {
                     this.executorService.awaitTermination( TIME_OUT_MAX_FIFO, TimeUnit.MILLISECONDS );
@@ -230,18 +229,18 @@ public class FifoController implements Runnable {
     {
         TimeUnit timeConvert    = TimeUnit.MILLISECONDS;
         long timer              = timeConvert.convert( time, timeUnit );
-        this.timerList.add( new TimerByCommand( numberOfCommand, timer ));
+        this.timerList.add( new TimerByTask( numberOfCommand, timer ));
     }
 
     /**
      *
-     * @param timerCommand
+     * @param timerTask
      */
-    public void addCounter( TimerCommand timerCommand)
+    public void addCounter( TimerTask timerTask)
     {
-        this.addCounter( timerCommand.getNumberOfCommand(),
-                timerCommand.getUnitTime(),
-                timerCommand.getTimeConvert() );
+        this.addCounter( timerTask.getNumberOfCommand(),
+                timerTask.getUnitTime(),
+                timerTask.getTimeConvert() );
     }
 
     public void setMaxTimerCommand( long time, TimeUnit timeUnit )
@@ -250,10 +249,10 @@ public class FifoController implements Runnable {
         this.maxTimeMillisByCommand = timeConvert.convert( time, timeUnit );
     }
 
-    public void setMaxTimerCommand( TimeOutCommand timeOutCommand )
+    public void setMaxTimerCommand( TimeOutTask timeOutTask)
     {
-        this.setMaxTimerCommand( timeOutCommand.getUnitTime(),
-                timeOutCommand.getTimeConvert() );
+        this.setMaxTimerCommand( timeOutTask.getUnitTime(),
+                timeOutTask.getTimeConvert() );
     }
 
     /**
